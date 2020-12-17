@@ -1,22 +1,51 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import './App.css';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import {
+  BrowserRouter as Router,
+  Route,
+  Switch,
+  useHistory,
+} from 'react-router-dom';
 import Home from './components/screens/Home';
 import SignIn from './components/screens/SignIn';
 import SignUp from './components/screens/SignUp';
 import Profile from './components/screens/Profile';
 import CreatePost from './components/screens/CreatePost';
+import UserContext from './context/userContext';
+import { USER } from './context/userTypes';
 
-function App() {
+const Routing = () => {
+  const history = useHistory();
+  const { state, dispatch } = useContext(UserContext);
+
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem('user'));
+
+    if (user) {
+      dispatch({ type: USER, payload: user });
+    } else {
+      //if (!history.location.pathname.startsWith('/reset'))
+      history.push('/signin');
+    }
+  }, [history, dispatch]);
+
   return (
-    <Router>
-      <Navbar />
+    <Switch>
       <Route path='/' exact component={Home} />
       <Route path='/signin' exact component={SignIn} />
       <Route path='/signup' exact component={SignUp} />
       <Route path='/profile' exact component={Profile} />
       <Route path='/create' exact component={CreatePost} />
+    </Switch>
+  );
+};
+
+function App() {
+  return (
+    <Router>
+      <Navbar />
+      <Routing />
     </Router>
   );
 }

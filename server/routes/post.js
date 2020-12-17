@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { check, validationResult } = require('express-validator');
 const requireLogin = require('../middleware/requireLogin');
 
 const Post = require('../models/Post');
 
-router.get('/allposts', (req, res) => {
+router.get('/allposts', requireLogin, (req, res) => {
   Post.find()
     .populate('postedBy', '_id name')
     .then((posts) => {
@@ -14,36 +13,24 @@ router.get('/allposts', (req, res) => {
     .catch((error) => res.status(400).send(error));
 });
 
-router.post(
-  '/createpost',
-  requireLogin,
-  [
-    check('title', 'Title is required...').not().isEmpty(),
-    check('body', 'Body is required...').not().isEmpty(),
-  ],
-  (req, res) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ error: errors.array() });
-    }
+router.post('/createpost', requireLogin, (req, res) => {
+  const { title, body, photo } = req.body;
 
-    const { title, body } = req.body;
+  req.user.password = undefined;
 
-    req.user.password = undefined;
-
-    const post = new Post({
-      title,
-      body,
-      postedBy: req.user,
-    });
-    post
-      .save()
-      .then((result) => {
-        res.status(200).json({ post: result });
-      })
-      .catch((error) => res.status(400).send(error));
-  }
-);
+  const post = new Post({
+    title,
+    body,
+    photo,
+    postedBy: req.user,
+  });
+  post
+    .save()
+    .then((result) => {
+      res.status(200).json({ post: result });
+    })
+    .catch((error) => res.status(400).send(error));
+});
 
 router.get('/myposts', requireLogin, (req, res) => {
   Post.find({ postedBy: req.user._id })
@@ -52,6 +39,42 @@ router.get('/myposts', requireLogin, (req, res) => {
       res.status(200).json({ myPosts });
     })
     .catch((error) => res.status(400).send(error));
+});
+
+router.put('/like', requireLogin, (req, res) => {
+  Post.findByIdAndUpdate(
+    req.body.postId,
+    {
+      $push: { likes: req.user._id },
+    },
+    {
+      new: true,
+    }
+  ).exec((error, result) => {
+    if (error) {
+      return res.status(400).send(error);
+    } else {
+      res.json(result);
+    }
+  });
+});
+
+router.put('/unlike', requireLogin, (req, res) => {
+  Post.findByIdAndUpdate(
+    req.body.postId,
+    {
+      $pull: { likes: req.user._id },
+    },
+    {
+      new: true,
+    }
+  ).exec((error, result) => {
+    if (error) {
+      return res.status(400).send(error);
+    } else {
+      res.json(result);
+    }
+  });
 });
 
 module.exports = router;

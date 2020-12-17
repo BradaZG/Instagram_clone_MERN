@@ -49,7 +49,7 @@ router.post(
   '/signin',
   [
     check('email', 'Please include a valid email...').isEmail(),
-    check('password', 'Password is required...').exists(),
+    check('password', 'Password is required...').not().isEmpty(),
   ],
   (req, res) => {
     const errors = validationResult(req);
@@ -76,7 +76,8 @@ router.post(
                 process.env.JWT_SECRET,
                 { expiresIn: 360000 }
               );
-              res.status(200).json({ token });
+              const { _id, name, email } = savedUser;
+              res.status(200).json({ token, user: { _id, name, email } });
             } else {
               return res.status(400).json({ error: 'Invalid credentials!' });
             }

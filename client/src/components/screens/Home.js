@@ -1,59 +1,42 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 const Home = () => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    fetch('/allposts', {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + localStorage.getItem('jwt'),
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        setData(result.posts);
+      });
+  }, []);
+
   return (
     <div className='home'>
-      <div className='card home-card'>
-        <h5>Domagoj</h5>
-        <div className='card-image'>
-          <img
-            src='https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80'
-            alt=''
-          />
-        </div>
-        <div className='card-content'>
-          <i className='material-icons' style={{ color: 'red' }}>
-            favorite
-          </i>
-          <h6>Title</h6>
-          <p>This is a cool post...</p>
-          <input type='text' placeholder='Add a comment...' />
-        </div>
-      </div>
-      <div className='card home-card'>
-        <h5>Domagoj</h5>
-        <div className='card-image'>
-          <img
-            src='https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80'
-            alt=''
-          />
-        </div>
-        <div className='card-content'>
-          <i className='material-icons' style={{ color: 'red' }}>
-            favorite
-          </i>
-          <h6>Title</h6>
-          <p>This is a cool post...</p>
-          <input type='text' placeholder='Add a comment...' />
-        </div>
-      </div>
-      <div className='card home-card'>
-        <h5>Domagoj</h5>
-        <div className='card-image'>
-          <img
-            src='https://images.unsplash.com/photo-1493246507139-91e8fad9978e?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80'
-            alt=''
-          />
-        </div>
-        <div className='card-content'>
-          <i className='material-icons' style={{ color: 'red' }}>
-            favorite
-          </i>
-          <h6>Title</h6>
-          <p>This is a cool post...</p>
-          <input type='text' placeholder='Add a comment...' />
-        </div>
-      </div>
+      {data &&
+        data.map((item) => {
+          return (
+            <div key={item._id} className='card home-card'>
+              <h5>{item.postedBy.name}</h5>
+              <div className='card-image'>
+                <img src={item.photo} alt={item.title} />
+              </div>
+              <div className='card-content'>
+                <i className='material-icons' style={{ color: 'red' }}>
+                  favorite
+                </i>
+                <h6>{item.title}</h6>
+                <p>{item.body}</p>
+                <input type='text' placeholder='Add a comment...' />
+              </div>
+            </div>
+          );
+        })}
     </div>
   );
 };
