@@ -75,7 +75,7 @@ const CreatePost = () => {
   };
 
   return (
-    <div
+    <form
       className='card input-field'
       style={{
         margin: '30px auto',
@@ -112,11 +112,14 @@ const CreatePost = () => {
       </div>
       <button
         className='btn #64b5f6 blue darken-1'
-        onClick={() => postDetails()}
+        onClick={(e) => {
+          e.preventDefault();
+          postDetails();
+        }}
       >
         Submit post
       </button>
-    </div>
+    </form>
   );
 };
 

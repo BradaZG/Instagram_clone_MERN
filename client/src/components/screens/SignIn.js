@@ -49,7 +49,7 @@ const SignIn = () => {
   };
 
   return (
-    <div className='card__container'>
+    <form className='card__container'>
       <div className='card auth__card input-field'>
         <h2>Instagram</h2>
         <input
@@ -67,7 +67,10 @@ const SignIn = () => {
         <button
           className='btn #64b5f6 blue darken-1'
           type='submit'
-          onClick={() => postData()}
+          onClick={(e) => {
+            e.preventDefault();
+            postData();
+          }}
         >
           SIGN IN
         </button>
@@ -75,7 +78,7 @@ const SignIn = () => {
           <Link to='/signup'>Don't have an account?</Link>
         </h6>
       </div>
-    </div>
+    </form>
   );
 };
 
