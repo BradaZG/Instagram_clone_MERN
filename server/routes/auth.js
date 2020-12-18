@@ -76,8 +76,13 @@ router.post(
                 process.env.JWT_SECRET,
                 { expiresIn: 360000 }
               );
-              const { _id, name, email } = savedUser;
-              res.status(200).json({ token, user: { _id, name, email } });
+              const { _id, name, email, followers, following } = savedUser;
+              res
+                .status(200)
+                .json({
+                  token,
+                  user: { _id, name, email, followers, following },
+                });
             } else {
               return res.status(400).json({ error: 'Invalid credentials!' });
             }

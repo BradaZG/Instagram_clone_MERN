@@ -8,6 +8,7 @@ const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth');
 const postRoutes = require('./routes/post');
+const userRoutes = require('./routes/user');
 
 const PORT = process.env.PORT || 4000;
 
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use(cors());
 app.use('/', authRoutes);
 app.use('/', postRoutes);
+app.use('/', userRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

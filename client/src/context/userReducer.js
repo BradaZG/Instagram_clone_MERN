@@ -1,4 +1,4 @@
-import { CLEAR, USER } from './userTypes';
+import { CLEAR, UPDATE, USER } from './userTypes';
 
 const UserReducer = (state, action) => {
   switch (action.type) {
@@ -6,6 +6,12 @@ const UserReducer = (state, action) => {
       return action.payload;
     case CLEAR:
       return null;
+    case UPDATE:
+      return {
+        ...state,
+        followers: action.payload.followers,
+        following: action.payload.following,
+      };
     default:
       return state;
   }

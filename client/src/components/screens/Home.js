@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import UserContext from '../../context/userContext';
 
 const Home = () => {
@@ -149,7 +150,15 @@ const Home = () => {
                   alignItems: 'center',
                 }}
               >
-                {item.postedBy.name}
+                <Link
+                  to={
+                    item.postedBy._id !== state._id
+                      ? `/profile/${item.postedBy._id}`
+                      : '/profile'
+                  }
+                >
+                  {item.postedBy.name}
+                </Link>
                 {item.postedBy._id === state._id && (
                   <i
                     className='material-icons'

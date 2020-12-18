@@ -14,6 +14,16 @@ router.get('/allposts', requireLogin, (req, res) => {
     .catch((error) => res.status(400).send(error));
 });
 
+router.get('/getsubscribedposts', requireLogin, (req, res) => {
+  Post.find({ postedBy: { $in: req.user.following } })
+    .populate('postedBy', '_id name')
+    .populate('comments.postedBy', '_id name')
+    .then((posts) => {
+      res.status(200).json({ posts: posts });
+    })
+    .catch((error) => res.status(400).send(error));
+});
+
 router.post('/createpost', requireLogin, (req, res) => {
   const { title, body, photo } = req.body;
 

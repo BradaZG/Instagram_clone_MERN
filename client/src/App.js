@@ -12,6 +12,7 @@ import SignIn from './components/screens/SignIn';
 import SignUp from './components/screens/SignUp';
 import Profile from './components/screens/Profile';
 import CreatePost from './components/screens/CreatePost';
+import UserProfile from './components/screens/UserProfile';
 import UserContext from './context/userContext';
 import { USER } from './context/userTypes';
 
@@ -37,6 +38,7 @@ const Routing = () => {
       <Route path='/signup' exact component={SignUp} />
       <Route path='/profile' exact component={Profile} />
       <Route path='/create' exact component={CreatePost} />
+      <Route path='/profile/:userId' exact component={UserProfile} />
     </Switch>
   );
 };
