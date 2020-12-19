@@ -13,6 +13,7 @@ import SignUp from './components/screens/SignUp';
 import Profile from './components/screens/Profile';
 import CreatePost from './components/screens/CreatePost';
 import UserProfile from './components/screens/UserProfile';
+import SubscribedUserPosts from './components/screens/SubscribedUserPosts';
 import UserContext from './context/userContext';
 import { USER } from './context/userTypes';
 
@@ -39,6 +40,11 @@ const Routing = () => {
       <Route path='/profile' exact component={Profile} />
       <Route path='/create' exact component={CreatePost} />
       <Route path='/profile/:userId' exact component={UserProfile} />
+      <Route
+        path='/subscribedusersposts'
+        exact
+        component={SubscribedUserPosts}
+      />
     </Switch>
   );
 };

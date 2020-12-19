@@ -5,9 +5,11 @@ import { UPDATE } from '../../context/userTypes';
 
 const UserProfile = () => {
   const [userProfile, setUserProfile] = useState(null);
-  const [showFollow, setShowFollow] = useState(true);
   const { state, dispatch } = useContext(UserContext);
   const { userId } = useParams();
+  const [showFollow, setShowFollow] = useState(
+    state ? !state.following.includes(userId) : true
+  );
 
   useEffect(() => {
     fetch(`/user/${userId}`, {
@@ -17,8 +19,11 @@ const UserProfile = () => {
       },
     })
       .then((res) => res.json())
-      .then((result) => setUserProfile(result));
-  }, [userId]);
+      .then((result) => {
+        setUserProfile(result);
+        setShowFollow(state ? !state.following.includes(userId) : true);
+      });
+  }, [userId, state]);
 
   const followUser = () => {
     fetch('/follow', {
@@ -101,8 +106,8 @@ const UserProfile = () => {
           >
             <div>
               <img
-                src='https://images.unsplash.com/flagged/photo-1570612861542-284f4c12e75f?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80'
-                alt=''
+                src={userProfile.user.profilePicture}
+                alt={userProfile.user.name}
                 style={{
                   width: '160px',
                   height: '160px',

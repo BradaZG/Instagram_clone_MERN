@@ -6,8 +6,8 @@ const Post = require('../models/Post');
 
 router.get('/allposts', requireLogin, (req, res) => {
   Post.find()
-    .populate('postedBy', '_id name')
-    .populate('comments.postedBy', '_id name')
+    .populate('postedBy', '_id name profilePicture')
+    .populate('comments.postedBy', '_id name profilePicture')
     .then((posts) => {
       res.status(200).json({ posts: posts });
     })
@@ -16,8 +16,8 @@ router.get('/allposts', requireLogin, (req, res) => {
 
 router.get('/getsubscribedposts', requireLogin, (req, res) => {
   Post.find({ postedBy: { $in: req.user.following } })
-    .populate('postedBy', '_id name')
-    .populate('comments.postedBy', '_id name')
+    .populate('postedBy', '_id name profilePicture')
+    .populate('comments.postedBy', '_id name profilePicture')
     .then((posts) => {
       res.status(200).json({ posts: posts });
     })
@@ -45,7 +45,7 @@ router.post('/createpost', requireLogin, (req, res) => {
 
 router.get('/myposts', requireLogin, (req, res) => {
   Post.find({ postedBy: req.user._id })
-    .populate('postedBy', '_id name')
+    .populate('postedBy', '_id name profilePicture')
     .then((myPosts) => {
       res.status(200).json({ myPosts });
     })
@@ -62,8 +62,8 @@ router.put('/like', requireLogin, (req, res) => {
       new: true,
     }
   )
-    .populate('comments.postedBy', '_id name')
-    .populate('postedBy', '_id name')
+    .populate('comments.postedBy', '_id name profilePicture')
+    .populate('postedBy', '_id name profilePicture')
     .exec((error, result) => {
       if (error) {
         return res.status(400).send(error);
@@ -83,8 +83,8 @@ router.put('/unlike', requireLogin, (req, res) => {
       new: true,
     }
   )
-    .populate('comments.postedBy', '_id name')
-    .populate('postedBy', '_id name')
+    .populate('comments.postedBy', '_id name profilePicture')
+    .populate('postedBy', '_id name profilePicture')
     .exec((error, result) => {
       if (error) {
         return res.status(400).send(error);
@@ -106,8 +106,8 @@ router.put('/comment', requireLogin, (req, res) => {
       new: true,
     }
   )
-    .populate('comments.postedBy', '_id name')
-    .populate('postedBy', '_id name')
+    .populate('comments.postedBy', '_id name profilePicture')
+    .populate('postedBy', '_id name profilePicture')
     .exec((error, result) => {
       if (error) {
         return res.status(400).send(error);

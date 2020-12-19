@@ -22,7 +22,7 @@ router.post(
       return res.status(400).json({ error: errors.array() });
     }
 
-    const { name, email, password } = req.body;
+    const { name, email, password, profilePicture } = req.body;
 
     // See if user exists
     User.findOne({ email: email })
@@ -32,7 +32,12 @@ router.post(
         }
 
         bcrypt.hash(password, 10).then((hashedPassword) => {
-          const user = new User({ name, email, password: hashedPassword });
+          const user = new User({
+            name,
+            email,
+            password: hashedPassword,
+            profilePicture,
+          });
           user
             .save()
             .then((response) => {
@@ -76,13 +81,25 @@ router.post(
                 process.env.JWT_SECRET,
                 { expiresIn: 360000 }
               );
-              const { _id, name, email, followers, following } = savedUser;
-              res
-                .status(200)
-                .json({
-                  token,
-                  user: { _id, name, email, followers, following },
-                });
+              const {
+                _id,
+                name,
+                email,
+                followers,
+                following,
+                profilePicture,
+              } = savedUser;
+              res.status(200).json({
+                token,
+                user: {
+                  _id,
+                  name,
+                  email,
+                  followers,
+                  following,
+                  profilePicture,
+                },
+              });
             } else {
               return res.status(400).json({ error: 'Invalid credentials!' });
             }

@@ -75,3 +75,10 @@ h2 {
 .material-icons:hover {
   cursor: pointer;
 }
+
+.profile__picture {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
