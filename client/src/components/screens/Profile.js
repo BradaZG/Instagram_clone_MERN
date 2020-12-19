@@ -1,8 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import UserContext from '../../context/userContext';
+import M from 'materialize-css';
+import { UPDATE_PICTURE } from '../../context/userTypes';
 
 const Profile = () => {
   const [myPics, setMyPics] = useState([]);
+  const [image, setImage] = useState('');
   const { state, dispatch } = useContext(UserContext);
 
   useEffect(() => {
@@ -16,36 +19,99 @@ const Profile = () => {
       .then((result) => setMyPics(result.myPosts));
   }, []);
 
+  useEffect(() => {
+    if (image) {
+      const imageData = new FormData();
+      imageData.append('file', image);
+      imageData.append('upload_preset', 'Instagram-clone');
+      imageData.append('cloud_name', 'bradazg');
+      M.toast({
+        html: 'Uploading image. Please wait...',
+        classes: '#43a047 green darken-1',
+        displayLength: Infinity,
+      });
+      fetch('https://api.cloudinary.com/v1_1/bradazg/image/upload', {
+        method: 'POST',
+        body: imageData,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          M.Toast.dismissAll();
+          M.toast({
+            html: 'Picture updated!',
+            classes: '#43a047 green darken-1',
+          });
+          localStorage.setItem(
+            'user',
+            JSON.stringify({ ...state, profilePicture: data.url })
+          );
+          dispatch({ type: UPDATE_PICTURE, payload: data.url });
+        })
+        .catch((err) => console.log(err));
+    }
+  }, [image, state]);
+
+  const updatePhoto = (file) => {
+    setImage(file);
+  };
+
   return (
     <div style={{ maxWidth: '550px', margin: '0px auto' }}>
       <div
         style={{
-          display: 'flex',
-          justifyContent: 'space-around',
           margin: '18px 0px',
           borderBottom: '1px solid grey',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
-        <div>
-          <img
-            src={state ? state.profilePicture : 'Loading...'}
-            alt={state ? state.name : 'Loading...'}
-            style={{ width: '160px', height: '160px', borderRadius: '80px' }}
-          />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-around',
+          }}
+        >
+          <div>
+            <img
+              src={state && state.profilePicture}
+              alt={state && state.name}
+              style={{ width: '160px', height: '160px', borderRadius: '80px' }}
+            />
+          </div>
+          <div>
+            <h4>{state ? state.name : 'Loading...'}</h4>
+            <h5>{state ? state.email : 'Loading...'}</h5>
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                width: '108%',
+              }}
+            >
+              <h6>{myPics.length} posts</h6>
+              <h6>{state ? state.followers.length : 0} followers</h6>
+              <h6>{state ? state.following.length : 0} following</h6>
+            </div>
+          </div>
         </div>
-        <div>
-          <h4>{state ? state.name : 'Loading...'}</h4>
-          <h5>{state ? state.email : 'Loading...'}</h5>
+        <div
+          className='file-field input-field'
+          style={{ marginTop: '5px', marginBottom: '5px' }}
+        >
+          <div className='btn #64b5f6 blue darken-1'>
+            <span>UPDATE PICTURE</span>
+            <input
+              type='file'
+              onChange={(e) => {
+                updatePhoto(e.target.files[0]);
+              }}
+            />
+          </div>
           <div
-            style={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              width: '108%',
-            }}
+            className='file-path-wrapper input-field'
+            style={{ marginTop: '0', marginBottom: '0' }}
           >
-            <h6>{myPics.length} posts</h6>
-            <h6>{state ? state.followers.length : 0} followers</h6>
-            <h6>{state ? state.following.length : 0} following</h6>
+            <input className='file-path validate' type='text' />
           </div>
         </div>
       </div>
