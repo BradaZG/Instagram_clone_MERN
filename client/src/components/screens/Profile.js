@@ -36,20 +36,39 @@ const Profile = () => {
       })
         .then((res) => res.json())
         .then((data) => {
-          M.Toast.dismissAll();
-          M.toast({
-            html: 'Picture updated!',
-            classes: '#43a047 green darken-1',
-          });
-          localStorage.setItem(
-            'user',
-            JSON.stringify({ ...state, profilePicture: data.url })
-          );
-          dispatch({ type: UPDATE_PICTURE, payload: data.url });
+          fetch('/updatepicture', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: 'Bearer ' + localStorage.getItem('jwt'),
+            },
+            body: JSON.stringify({
+              profilePicture: data.url,
+            }),
+          })
+            .then((res) => res.json())
+            .then((result) => {
+              M.Toast.dismissAll();
+              localStorage.setItem(
+                'user',
+                JSON.stringify({
+                  ...state,
+                  profilePicture: result.profilePicture,
+                })
+              );
+              dispatch({
+                type: UPDATE_PICTURE,
+                payload: result.profilePicture,
+              });
+              M.toast({
+                html: 'Picture updated!',
+                classes: '#43a047 green darken-1',
+              });
+            });
         })
         .catch((err) => console.log(err));
     }
-  }, [image, state]);
+  }, [image]);
 
   const updatePhoto = (file) => {
     setImage(file);

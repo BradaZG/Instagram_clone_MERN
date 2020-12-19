@@ -72,8 +72,9 @@ h2 {
 }
 
 #toast-container {
-  top: 40px !important;
-  right: 20px !important;
+  position: absolute;
+  top: 50px !important;
+  right: 30px !important;
   left: auto !important;
 }
 
