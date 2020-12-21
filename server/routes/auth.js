@@ -1,10 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator');
+const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const nodemailer = require('nodemailer');
+const sendgridTransport = require('nodemailer-sendgrid-transport');
 
 const User = require('../models/User');
+
+const transporter = nodemailer.createTransport(
+  sendgridTransport({
+    auth: {
+      api_key: process.env.SENDGRID_API,
+    },
+  })
+);
 
 router.post(
   '/signup',
@@ -41,6 +52,12 @@ router.post(
           user
             .save()
             .then((response) => {
+              // transporter.sendMail({
+              //     to:user.email,
+              //     from:"no-reply@instagram-clone.com",
+              //     subject:"Signup successful",
+              //     html:"<h1>Welcome to Instagram clone!</h1>"
+              // })
               res.status(200).json({ msg: 'Saved successfully!' });
             })
             .catch((error) => res.status(400).send(error));
@@ -78,8 +95,8 @@ router.post(
             if (isMatch) {
               const token = jwt.sign(
                 { _id: savedUser._id },
-                process.env.JWT_SECRET,
-                { expiresIn: 360000 }
+                process.env.JWT_SECRET
+                // { expiresIn: 360000 }
               );
               const {
                 _id,
@@ -109,5 +126,56 @@ router.post(
       .catch((error) => res.status(400).send(error));
   }
 );
+
+router.post('/resetpassword', (req, res) => {
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+    }
+    const token = buffer.toString('hex');
+    User.findOne({ email: req.body.email })
+      .then((user) => {
+        if (!user) {
+          return res.status(400).json({ error: "User doesn't exist..." });
+        }
+        user.resetToken = token;
+        user.expireToken = Date.now() + 3600000;
+        user.save().then((result) => {
+          transporter.sendMail({
+            to: user.email,
+            from: 'no-reply@instagram-clone.com',
+            subject: 'Password reset',
+            html: `
+                     <p>You requested a password reset</p>
+                     <h5>Click <a href="${process.env.EMAIL}/resetpassword/${token}">here</a> to reset password</h5>
+                     `,
+          });
+          console.log(token);
+          res.json({ message: 'Check your email...' });
+        });
+      })
+      .catch((error) => res.status(400).send(error));
+  });
+});
+
+router.post('/newpassword', (req, res) => {
+  const newPassword = req.body.password;
+  const sentToken = req.body.token;
+  User.findOne({ resetToken: sentToken, expireToken: { $gt: Date.now() } })
+    .then((user) => {
+      if (!user) {
+        return res.status(400).json({ error: 'Session expired, try again...' });
+      }
+      bcrypt.hash(newPassword, 10).then((hashedpassword) => {
+        user.password = hashedpassword;
+        user.resetToken = undefined;
+        user.expireToken = undefined;
+        user.save().then((saveduser) => {
+          res.json({ message: 'Password updated!' });
+        });
+      });
+    })
+    .catch((error) => res.status(400).send(error));
+});
 
 module.exports = router;

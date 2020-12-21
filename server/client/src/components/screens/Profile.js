@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import UserContext from '../../context/userContext';
 import M from 'materialize-css';
 import { UPDATE_PICTURE } from '../../context/userTypes';
@@ -7,6 +7,7 @@ const Profile = () => {
   const [myPics, setMyPics] = useState([]);
   const [image, setImage] = useState('');
   const { state, dispatch } = useContext(UserContext);
+  const inputRef = useRef();
 
   useEffect(() => {
     fetch('/myposts', {
@@ -48,6 +49,7 @@ const Profile = () => {
           })
             .then((res) => res.json())
             .then((result) => {
+              inputRef.current.value = '';
               M.Toast.dismissAll();
               localStorage.setItem(
                 'user',
@@ -68,6 +70,7 @@ const Profile = () => {
         })
         .catch((err) => console.log(err));
     }
+    // eslint-disable-next-line
   }, [image]);
 
   const updatePhoto = (file) => {
@@ -130,7 +133,7 @@ const Profile = () => {
             className='file-path-wrapper input-field'
             style={{ marginTop: '0', marginBottom: '0' }}
           >
-            <input className='file-path validate' type='text' />
+            <input ref={inputRef} className='file-path validate' type='text' />
           </div>
         </div>
       </div>

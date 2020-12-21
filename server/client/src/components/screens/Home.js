@@ -5,7 +5,7 @@ import UserContext from '../../context/userContext';
 const Home = () => {
   const [data, setData] = useState([]);
   const [comment, setComment] = useState('');
-  const { state, dispatch } = useContext(UserContext);
+  const { state } = useContext(UserContext);
 
   useEffect(() => {
     fetch('/allposts', {
